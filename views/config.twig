@@ -1,0 +1,114 @@
+{% extends 'admin.base' %}
+
+{% block title %}{{ trans('Yggdrasil::config.title') }}{% endblock %}
+
+{% block content %}
+  <style>
+    textarea {
+      font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, Courier, monospace;
+    }
+  </style>
+
+  <div class="row">
+    <div class="col-md-6">
+      {{ forms.common|raw }}
+      {{ forms.union|raw }}
+      <div class="card card-success">
+        <div class="card-header">
+          <h3 class="card-title">{{ trans('Yggdrasil::config.union.data.title') }}</h3>
+        </div>
+        <div class="card-body">
+          <p id="union-uptodate">{{ trans('Yggdrasil::config.union.data.uptodate') }}</p>
+          <p id="union-outdated" hidden>{{ trans('Yggdrasil::config.union.data.outdated') }}</p>
+          <button id="union-update-list" class="btn btn-default" onClick="triggerUpdate()" value="">{{ trans('Yggdrasil::config.union.data.trigger_update') }}</button>
+          <button id="union-update-key" class="btn btn-default" onClick="triggerUpdateKey()" value="">{{ trans('Yggdrasil::config.union.data.trigger_update_key') }}</button>
+          <button id="union-sync" class="btn btn-default" onClick="triggerSync()" value="">{{ trans('Yggdrasil::config.union.data.trigger_sync') }}</button>
+        </div>
+      </div>
+      <div class="card card-primary">
+        <div class="card-header">
+          <h3 class="card-title">{{ trans('Yggdrasil::config.keypair.title') }}</h3>
+        </div>
+        <div class="card-body">
+          <p>{{ trans('Yggdrasil::config.union.keypair.label') }}</p>
+          <textarea class="form-control" rows="10" readonly>{{ private_key }}</textarea>
+        </div>
+      </div>
+      {{ forms.union_oauth2_form|raw }}
+    </div>
+    <div class="col-md-6">
+      <div class="card card-success">
+        <div class="card-header">
+          <h3 class="card-title"><i class="fa fa-star"></i> API Root</h3>
+        </div>
+        <div class="card-body">
+          <p>{{ trans('Yggdrasil::config.url.label') }}<code>{{ url('api/yggdrasil') }}</code></p>
+          <p>{{ trans('Yggdrasil::config.url.notice') }}</p>
+        </div>
+      </div>
+      <div class="card card-success">
+        <div class="card-header">
+          <h3 class="card-title">{{ trans('Yggdrasil::config.union.admin_notice') }}</h3>
+        </div>
+        <div class="card-body">
+          <p id="notice"></p>
+        </div>
+      </div>
+      {{ forms.restore_api|raw }}
+      <div class="card">
+        <div class="card-header">
+          <h3 class="card-title">{{ trans('Yggdrasil::config.union.backend.title') }}</h3>
+        </div>
+        <div class="card-body p-0">
+        {{ include('Yggdrasil::servers.twig') }}
+        </div>
+      </div>
+      <script src="https://gcore.jsdelivr.net/npm/marked@4.1.1/marked.min.js"></script>
+      <script src="https://gcore.jsdelivr.net/npm/dompurify@2.4.0/dist/purify.min.js"></script>
+      <script>
+        function triggerUpdate() {
+            blessing.fetch.post("/admin/union/member/updatelist").then((response) => {
+              location.reload();
+            });
+        }
+        function triggerUpdateKey() {
+            blessing.fetch.post("/admin/union/member/updateprivatekey").then((response) => {
+              location.reload();
+            });
+        }
+        function triggerSync() {
+            blessing.fetch.post("/admin/union/member/sync").then((response) => {
+              location.reload();
+            });
+        }
+        function fetchAdminNotice(api) {
+            let conf = { method: 'GET',
+                   mode: 'cors'};
+            let request = new Request(api);
+            let e = document.getElementById("notice");
+            fetch(request, conf).then(function(response) {
+              	response.json().then(function(data) {
+        		    e.innerHTML = DOMPurify.sanitize(marked.parse(data.meta.admin_notice));
+              	});
+        	});
+        }
+        fetch("{{ union_api_root }}").then((r) => {
+        	r.json().then((response) => {
+        	    console.log(response);
+        		if (response.version != {{ server_list_version }}) {
+                    document.getElementById('union-uptodate').setAttribute('hidden', 'true');
+                    document.getElementById('union-outdated').removeAttribute('hidden');
+                    document.getElementById('union-update-list').removeAttribute('hidden');
+                  }
+                  if (response.privateKeyVersion != {{ private_key_version }}) {
+                    document.getElementById('union-uptodate').setAttribute('hidden', 'true');
+                    document.getElementById('union-outdated').removeAttribute('hidden');
+                    document.getElementById('union-update-key').removeAttribute('hidden');
+                  }
+        	});
+        });
+        fetchAdminNotice('{{ union_api_root }}');
+      </script>
+    </div>
+  </div>
+{% endblock %}

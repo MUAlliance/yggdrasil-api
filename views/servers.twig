@@ -1,0 +1,34 @@
+<table class="table table-striped">
+<thead>
+    <tr>
+    <td>{{ trans('Yggdrasil::config.union.backend.code') }}</td>
+    <td>{{ trans('Yggdrasil::config.union.backend.bs_root') }}</td>
+    <td>{{ trans('Yggdrasil::config.union.backend.name') }}</td>
+    <td></td>
+    </tr>
+</thead>
+<tbody>
+{% for backend in servers %}
+    <tr>
+        <td>{{ backend.code }}</td>
+        <td><a href="{{ backend.bs_root }}">{{ backend.bs_root }}</a></td>
+        <td name="backend-name" code="{{ backend.code }}" api="{{ backend.bs_root }}/api/yggdrasil"></td>
+        <td></td>
+    </tr>
+{% endfor %}
+</tbody>
+</table>
+<script>
+function getBackendNames() {
+    document.getElementsByName("backend-name").forEach((e, key, parent) => {
+        let request = new Request(e.getAttribute("api"));
+    
+        fetch(request).then(function(response) {
+          	response.json().then(function(data){
+    		    e.innerHTML = data.meta.serverName;
+          	});
+    	});
+    })
+}
+getBackendNames();
+</script>

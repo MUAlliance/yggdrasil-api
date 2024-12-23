@@ -1,0 +1,96 @@
+title: Yggdrasil API 配置
+
+url:
+  label: 本站的 Yggdrasil API 地址：
+  notice: 请确认以上 URL 能够正常访问后再进行 authlib-injector 的配置。
+
+common:
+  title: 常规配置
+  ygg_uuid_algorithm:
+    title: UUID 生成算法
+    v3: 'Version 3: 与原盗版用户 UUID 一致（推荐）'
+    v4: 'Version 4: 随机生成（想要同时兼容盗版登录的不要选）'
+    hint: 选择 Version 3 以获得对原盗版服务器的最佳兼容性。
+  ygg_token_expire_1:
+    title: 令牌暂时失效时间
+  ygg_token_expire_2:
+    title: 令牌完全失效时间
+    description: 分别指定 Token「暂时失效」与「完全失效」的过期时间，单位为秒
+  ygg_tokens_limit:
+    title: 令牌数量限制
+    description: 限制每个用户能拥有令牌的最大数量
+  ygg_rate_limit:
+    title: 登录/登出频率限制
+    hint: 两次操作之间的时间间隔（毫秒）
+  ygg_skin_domain:
+    title: 额外皮肤白名单域名
+    description: 只有在此列表中的材质才能被加载。「本站地址」和「当前访问地址」已经默认添加至白名单列表，需要添加的额外白名单域名请使用半角逗号 (,) 分隔
+  ygg_search_profile_max:
+    title: 批量查询角色数量限制
+    hint: 一次请求中最多能查询几个角色
+  ygg_show_config_section:
+    title: 显示快速配置板块
+    label: 在用户中心首页显示「快速配置启动器」板块
+  ygg_enable_ali:
+    title: API 地址指示
+    label: 开启「API 地址指示 (ALI)」功能
+
+keypair:
+  title: 密钥对配置
+  ygg_private_key:
+    title: OpenSSL 私钥
+    hint: 只需填写 PEM 格式的私钥即可，公钥会根据私钥自动生成。
+    generate: 生成私钥
+    submit: 保存私钥
+    message: 使用下方的按钮来自动生成符合格式的私钥。
+    valid: 私钥有效。
+    invalid: 无效的私钥，请检查后重新配置。
+
+rsa:
+  invalid: 无效的 RSA 私钥，请访问插件配置页重新设置
+  length: RSA 私钥的长度至少为 4096，请访问插件配置页重新设置
+  
+restore:
+  title: Restore API
+  enable:
+    title: 启用Restore API
+    label: 启用Restore API（配合修改版MultiLogin插件使用）
+  
+union:
+  title: Union相关配置
+  keypair:
+    label: 用户信息签名密钥，由Union主服务器生成。
+  api_root:
+    title: Union API Root
+  member_key:
+    title: Union Member Key
+    hint: 成员服务器认证令牌，请妥善保管
+  data:
+    title: Union数据
+    outdated: 数据已过时
+    uptodate: 数据已同步
+    trigger_update: 更新服务器列表
+    trigger_update_key: 更新密钥对
+    trigger_sync: 同步角色数据
+  backend:
+    title: 皮肤站列表
+    code: 皮肤站缩写
+    name: 皮肤站名称
+    bs_root: 皮肤站链接
+  admin_notice: 通知
+  enable_update:
+    title: 允许插件自动更新
+  local_blacklist:
+    title: 本地启用黑名单
+    hint: 该选项启用时：1) 使用本地API（而不是Union API）的服务器也启用黑名单；2) 通过此站点登录的封禁用户，加入服务器时会显示“已封禁”而不是“身份验证服务器宕机”。
+  oauth2:
+    title: Union OAuth2
+    sig_private_key:
+      title: 签名私钥
+      hint: 对发送给Union服务器的用户信息签名
+    sig_public_key:
+      title: 验签公钥
+      hint: Union服务器使用此公钥验证用户信息，确认来自这个站点
+    sig_key:
+      valid: 密钥有效
+      invalid: 密钥无效，此站点无法授权Union OAuth2

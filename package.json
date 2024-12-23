@@ -1,0 +1,18 @@
+{
+  "name": "yggdrasil-api",
+  "version": "5.2.2-0.2.0",
+  "title": "Yggdrasil API",
+  "description": "Yggdrasil API + authlib-injector = ✨ | with Union API Support",
+  "author": ["printempw", "__ART1st__"],
+  "namespace": "Yggdrasil",
+  "require": {
+    "blessing-skin-server": "^6"
+  },
+  "enchants": {
+    "config": "Controllers\\ConfigController",
+    "icon": {
+      "fa": "khanda",
+      "bg": "info"
+    }
+  }
+}

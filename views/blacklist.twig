@@ -1,0 +1,150 @@
+{% extends 'admin.base' %}
+
+{% block title %}{{ trans('Yggdrasil::union.blacklist.title') }}{% endblock %}
+
+{% block content %}
+
+<div class="card card-success">
+  <div class="card-header">
+    <h3 class="card-title">{{ trans('Yggdrasil::union.blacklist.add') }}</h3>
+  </div>
+  <form method="POST" action="{{ url('/admin/union/blacklist/create') }}">
+    <div class="card-body">
+      {{ csrf_field() }}
+      <div class="form-group">
+        <label>{{ trans('Yggdrasil::union.blacklist.email') }}</label>
+        <input class="form-control" name="email" type="text" />
+      </div>
+      <div class="form-group">
+        <label>{{ trans('Yggdrasil::union.blacklist.reason') }}</label>
+      	<input class="form-control" name="reason" type="text" />
+      </div>
+      <div class="form-group">
+        <p>{{ trans('Yggdrasil::union.blacklist.add_hint') }}</p>
+      </div>
+    </div>
+    <div class="card-footer">
+      <button class="btn btn-primary" type="submit">{{ trans('Yggdrasil::union.blacklist.submit') }}</button>
+    </div>
+  </form>
+</div>
+
+<div class="card">
+  <div class="card-header css-viw8im">
+    <form class="input-group" id="search-form">
+      <input type="text" id="search" inputmode="search" class="form-control" title="{{ trans('Yggdrasil::union.blacklist.search') }}" value="" placeholder="keyword">
+      <div class="input-group-append"><button class="btn btn-primary" type="submit">{{ trans('Yggdrasil::union.blacklist.search') }}</button></div>
+    </form>
+    <p>{{ trans('Yggdrasil::union.blacklist.search_hint') }}</p>
+  </div>
+  <div class="card-body table-responsive p-0">
+    <table class="table table-striped">
+      <thead>
+        <tr>
+          <th>{{ trans('Yggdrasil::union.blacklist.id') }}</th>
+          <th>{{ trans('Yggdrasil::union.blacklist.email') }}</th>
+          <th>{{ trans('Yggdrasil::union.blacklist.source') }}</th>
+          <th>{{ trans('Yggdrasil::union.blacklist.reason') }}</th>
+          <th>{{ trans('Yggdrasil::union.blacklist.created_at') }}</th>
+          <th>{{ trans('Yggdrasil::union.blacklist.valid_until') }}</th>
+          <th>{{ trans('Yggdrasil::union.blacklist.operation.text') }}</th>
+        </tr>
+      </thead>
+      <tbody id="tbody">
+      </tbody>
+    </table>
+  </div>
+</div>
+<div class="card-footer">
+  <div class="float-right">
+    <ul class="pagination" id="pagination">
+    </ul>
+  </div>
+</div>
+<script>
+function fetchPage(page = 1) {
+  let qs = document.getElementById('search').value;
+  blessing.fetch.get("/admin/union/view/blacklist/list", {'q' : qs, 'page' : page}).then((pageData) => {
+    let oldTable = document.getElementById("tbody");
+    let table = document.createElement("tbody");
+    table.id = "tbody";
+    oldTable.parentNode.replaceChild(table, oldTable);
+    for (let id in pageData.data) {
+      let item = pageData.data[id];
+      let tr = document.createElement("tr");
+      let content = [item.id, item.email, item.source, item.reason, item.created_at, item.valid_until];
+      for (let i in content) {
+        let th = document.createElement("th");
+        th.innerHTML = content[i];
+        tr.appendChild(th);
+      }
+      let th = document.createElement("th");
+      th.innerHTML = '<span> \
+                    <button class="btn btn-default" onclick="invalidateBlacklistItem(' + item.id + ')">{{ trans('Yggdrasil::union.blacklist.operation.invalidate') }}</button> \
+                    <button class="btn btn-danger" onclick="deleteBlacklistItem(' + item.id + ')">{{ trans('Yggdrasil::union.blacklist.operation.delete') }}</button> \
+                  </span>';
+      tr.appendChild(th);
+      table.appendChild(tr);
+    }
+    
+    let paginationHTML = "";
+    for (let id in pageData.links) {
+      let item = pageData.links[id];
+      if (item.label == "pagination.previous") {
+        paginationHTML += ' \
+          <li class="page-item' + ((item.url === null) ? ' disabled' : '') + '" title="{{ trans("Union::profilemaps_list.last_page") }}"> \
+            <a href="#" class="page-link" aria-disabled="' + (item.url === null) + '"' + ((item.url === null) ? '' : (' onclick="fetchPage(' + item.label + ');return false;"')) + '> \
+              ‹ \
+              <span class="d-inline d-sm-none ml-1">{{ trans("Union::profilemaps_list.last_page") }}</span> \
+            </a> \
+          </li> \
+        ';
+      } else if (item.label == "pagination.next") {
+        paginationHTML += ' \
+          <li class="page-item' + ((item.url === null) ? ' disabled' : '') + '" title="{{ trans("Union::profilemaps_list.next_page") }}"> \
+            <a href="#" class="page-link" aria-disabled="' + (item.url === null) + '"' + ((item.url === null) ? '' : (' onclick="fetchPage(' + item.label + ');return false;"')) + '> \
+              › \
+              <span class="d-inline d-sm-none ml-1">{{ trans("Union::profilemaps_list.next_page") }}</span> \
+            </a> \
+          </li> \
+        ';
+      } else {
+        paginationHTML += ' \
+          <li class="page-item d-none d-sm-block' + ((item.url === null) ? ' disabled' : '') + (item.active ? ' active' : '') + '"> \
+        	<a href="#" class="page-link" aria-disabled="' + (item.url === null) + '"' + ((item.url === null) ? '' : (' onclick="fetchPage(' + item.label + ');return false;"')) + '>' + item.label + '</a> \
+      	  </li> \
+        ';
+      }
+    }
+    document.getElementById("pagination").innerHTML = paginationHTML;
+   });
+}
+function search() {
+  fetchPage();
+  return false;
+}
+function initContent() {
+  document.getElementById('search-form').onsubmit = search;
+  fetchPage();
+}
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initContent);
+} else {
+  initContent();
+}
+function deleteBlacklistItem(id) {
+    if (confirm("{{ trans('Yggdrasil::union.blacklist.operation.confirm_deletion') }}")) {
+        blessing.fetch.post("/admin/union/blacklist/delete/" + id).then((response) => {
+            location.reload();
+        });
+    }
+}
+function invalidateBlacklistItem(id) {
+    if (confirm("{{ trans('Yggdrasil::union.blacklist.operation.confirm_invalidation') }}")) {
+        blessing.fetch.post("/admin/union/blacklist/invalidate/" + id).then((response) => {
+            location.reload();
+        });
+    }
+}
+</script>
+{% endblock %}

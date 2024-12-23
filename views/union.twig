@@ -1,0 +1,196 @@
+{% extends 'user.base' %}
+
+{% block title %}{{ trans('Yggdrasil::union.title') }}{% endblock %}
+
+{% block content %}
+
+  <div class="row">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+              <h3 class="card-title">{{ trans('Yggdrasil::union.profile.title') }}</h3>
+            </div>
+            <div class="card-body">
+              <p>{{ trans('Yggdrasil::union.profile.label') }}</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-body">
+              <p id="desc"></p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-12">
+    	<div class="card">
+            <div class="card-header">
+              <h3 class="card-title">{{ trans('Yggdrasil::union.backend.security.level') }}</h3>
+            </div>
+            <div class="card-body">
+  				<div class="row">
+                    <div class="col-md-3">
+                        <span>{{ trans('Yggdrasil::union.backend.security.label') }}: </span><span id="security-level" class="badge"></span>
+                    </div>
+                    <div class="col-md-9">
+                      <div><span id="security-level" class="badge bg-success">SL3</span><span>: {{ trans('Yggdrasil::union.backend.security.desc_sl3') }}</span></div>
+                      <div><span id="security-level" class="badge bg-yellow">SL1</span><span>: {{ trans('Yggdrasil::union.backend.security.desc_sl1') }}</span></div>
+                      <div><span id="security-level" class="badge bg-danger">SL0</span><span>: {{ trans('Yggdrasil::union.backend.security.desc_sl0') }}</span></div>
+                    </div>
+  				</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-12">
+    {% for profile in profiles %}
+    <div class="card">
+      	<div class="card-header">
+        	<h3 class="card-title">ID: {{ profile.self.name }}</h3>
+        </div>
+        <div class="card-body p-0">
+      <table class="table table-striped">
+        <thead>
+          <tr>
+            <td>{{ trans('Yggdrasil::union.profile.mapped_name') }}</td>
+            <td>{{ trans('Yggdrasil::config.union.backend.code') }}</td>
+            <td>{{ trans('Yggdrasil::config.union.backend.name') }}</td>
+            <td>UUID</td>
+            <td>{{ trans('Yggdrasil::union.profile.other_info') }}</td>
+            <td></td>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>{{ profile.self.bind_mapped_name }}</td>
+            <td>{{ profile.self.backend_scopes.self }}</td>
+            <td name="backend-name" api="{{ profile.self.backend }}/api/yggdrasil"></td>
+            <td>{{ trans('Yggdrasil::union.profile.uuid.mapped') }}: {{ profile.self.mapped_uuid }}<br>{{ trans('Yggdrasil::union.profile.uuid.unmapped') }}: {{ profile.self.uuid }}</td>
+            <td>{{ trans('Yggdrasil::union.profile.yourself') }}</td>
+            <td><button class="btn btn-danger" type="button" onClick="remapUUID('{{ profile.self.uuid }}', '{{ profile.self.mapped_uuid }}')">{{ trans('Yggdrasil::union.bind.button.remapuuid') }}</button></td>
+          </tr>
+          {% for d in profile.self.bind %}
+          <tr>
+            <td>{{ d.bind_mapped_name }}</td>
+            <td>{{ d.backend_scopes.self }}</td>
+            <td name="backend-name" api="{{ d.backend }}/api/yggdrasil"></td>
+            {% if d.bind_status == 0 %}
+            <td><b>{{ trans('Yggdrasil::union.profile.uuid.using') }}: {{ d.uuid }}</b><br>{{ trans('Yggdrasil::union.profile.uuid.unmapped') }}: {{ d.mapped_uuid }}</td>
+            {% else %}
+            <td>{{ trans('Yggdrasil::union.profile.uuid.mapped') }}: {{ d.uuid }}<br>{{ trans('Yggdrasil::union.profile.uuid.unmapped') }}: {{ d.mapped_uuid }}</td>
+            {% endif %}
+            <td>{{ d.bind_status == 0 ? trans('Yggdrasil::union.profile.bind_master') : '' }}</td>
+            <td><button class="btn btn-danger" type="button" onClick="remapUUID('{{ profile.self.uuid }}', '{{ d.mapped_uuid }}')">{{ trans('Yggdrasil::union.bind.button.remapuuid') }}</button></td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      {% if profile.dup_name|length > 0 %}
+      <div class="card-body"><label>{{ trans('Yggdrasil::union.profile.dup.name') }}</label></div>
+      <table class="table table-striped">
+        <thead>
+          <tr>
+            <td>{{ trans('Yggdrasil::union.profile.mapped_name') }}</td>
+            <td>{{ trans('Yggdrasil::config.union.backend.code') }}</td>
+            <td>{{ trans('Yggdrasil::config.union.backend.name') }}</td>
+          </tr>
+        </thead>
+        <tbody>
+          {% for d in profile.dup_name %}
+          <tr>
+            <td>{{ d.bind_mapped_name }}</td>
+            <td>{{ d.backend_scopes.self }}</td>
+            <td name="backend-name" api="{{ d.backend }}/api/yggdrasil"></td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      {% endif %}
+        <div class="card-body">
+          {% if profile.self.bind_status == 1 %}
+            <button class="btn btn-danger" type="button" onClick="unbind('{{ profile.self.uuid }}')">{{ trans('Yggdrasil::union.bind.button.unbind') }}</button>
+          {% else %}
+            <label class="">{{ trans('Yggdrasil::union.bind.label') }}</label>
+            <div class="input-group">
+              <input class="form-control" id="token-input-{{ profile.self.uuid }}" type="text" />
+              <span class="input-group-append">
+                <button class="btn btn-success" type="button" onClick="bindTo('{{ profile.self.uuid }}')">{{ trans('Yggdrasil::union.bind.button.bindto') }}</button>
+              </span>
+            </div>
+          <div class="input-group pt-2">
+              <button class="btn btn-primary float-right" type="button" onClick="fetchToken('{{ profile.self.uuid }}')">{{ trans('Yggdrasil::union.bind.button.token') }}</button>
+              <div class="pl-4" id="token-fetched-{{ profile.self.uuid }}"></div>
+          </div>
+          {% endif %}
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+    <div class="card">
+        <div class="card-header">
+          <h3 class="card-title">{{ trans('Yggdrasil::config.union.backend.title') }}</h3>
+        </div>
+        <div class="card-body p-0">
+        {% include 'Yggdrasil::servers.twig' %}
+        </div>
+    </div>
+  </div>
+<script src="https://gcore.jsdelivr.net/npm/marked@4.1.1/marked.min.js"></script>
+<script src="https://gcore.jsdelivr.net/npm/dompurify@2.4.0/dist/purify.min.js"></script>
+<script>
+function fetchToken(uuid) {
+  blessing.fetch.post("/union/bind", { 'uuid' : uuid }).then((response) => {
+    let e = document.getElementById("token-fetched-"+uuid);
+    e.innerHTML = response.token;
+  });
+}
+function bindTo(uuid) {
+  let e = document.getElementById("token-input-"+uuid);
+  blessing.fetch.post("/union/bindto", { 'uuid' : uuid, 'token' : e.value }).then((response) => {
+        location.reload();
+    });
+}
+function unbind(uuid) {
+  if (confirm("{{ trans('Yggdrasil::union.bind.unbind.confirm') }}")) {
+    blessing.fetch.post("/union/unbind", { 'uuid' : uuid }).then((response) => {
+        location.reload();
+    });
+  }
+}
+function remapUUID(me, target) {
+  if (confirm("{{ trans('Yggdrasil::union.bind.remapuuid.confirm') }}")) {
+    blessing.fetch.post("/union/remapuuid", { 'me' : me, 'target' : target }).then((response) => {
+        location.reload();
+    });
+  }
+}
+function fetchDescription(api) {
+    let conf = { method: 'GET',
+           mode: 'cors'};
+    let request = new Request(api);
+    let e = document.getElementById("desc");
+    fetch(request, conf).then(function(response) {
+      	response.json().then(function(data) {
+		    e.innerHTML = DOMPurify.sanitize(marked.parse(data.meta.description));
+      	});
+	});
+}
+  function fetchSecurityLevel() {
+    let conf = { method: 'GET',
+           mode: 'cors'};
+    let request = new Request('/union/security/level');
+    let e = document.getElementById("security-level");
+    fetch(request, conf).then(function(response) {
+      	response.json().then(function(data) {
+		    e.innerHTML = "SL" + data;
+            if (data == 3) {
+                e.classList.add('bg-success');
+            } else {
+                e.classList.add('bg-yellow');
+            }
+      	});
+	});
+}
+fetchDescription('{{ union_api_root }}');
+fetchSecurityLevel();
+</script>
+{% endblock %}

@@ -1,0 +1,58 @@
+title: Union
+
+profile:
+  title: 角色绑定和冲突检查
+  label: Union中其他皮肤站可能注册了具有相同名称的角色，在此情况下会生成一个映射名称用于避免冲突。你可以更改角色名，如果另一个角色也是由你拥有的话，也可以进行角色绑定，被绑定到的角色称为主角色。通过绑定的角色登录使用Union验证的服务器，会使用主角色的名称和UUID，但皮肤和披风则是使用当前角色的。主角色不能绑定到其他角色。另外，角色名称并不影响绑定。绑定UUID是指将该UUID同步到所有皮肤站。如果你在使用1.19及以上版本加入服务器时出现无效的签名，可能需要绑定UUID。对于1.19以下版本，绑定UUID不是必须的。在不使用Union的Minecraft服务器上，你的玩家数据可能会丢失。此操作无法撤销！
+  mapped_name: 映射角色名称
+  other_info: 其他信息
+  yourself: 当前角色
+  bind_master: 绑定的主角色
+  dup:
+    name: 拥有相同名称的其他角色
+  uuid:
+    mapped: 重映射UUID
+    unmapped: 原始UUID
+    using: 正在使用的
+    
+exceptions:
+  profile_update_failed: Union中可能有其他重名角色。
+
+bind:
+  label: 获取Token，该角色将成为主角色，将另一角色绑定到该角色；或输入Token，将该角色绑定到另一角色，另一角色将成为主角色。Token在2分钟内有效。
+  button:
+    token: 获取Token
+    bindto: 绑定
+    unbind: 解绑
+    remapuuid: 全部绑定该UUID
+  unbind:
+    confirm: 确认解绑？
+  remapuuid:
+    confirm: 注意！绑定的UUID将同步到所有皮肤站。对于不使用Union的Minecraft服务器，修改UUID将导致基于UUID的玩家数据不再有效。表格中的UUID是重映射后的UUID，可能与皮肤站的UUID并不相同。
+
+backend:
+  security:
+    level: 站点安全性
+    label: 安全级别
+    desc_sl3: 已接入联合黑名单；经认证的高信任评级
+    desc_sl1: 已接入联合黑名单
+    desc_sl0: 未接入联合黑名单
+
+blacklist:
+  title: 联合黑名单
+  add: 添加
+  add_hint: 添加前，请务必前往wiki查看注意事项，并在MUA理事会群内通知。
+  email: 邮箱
+  reason: 理由
+  submit: 提交
+  search: 搜索
+  search_hint: 删除：从数据库中移除；释放：移出黑名单，但保留在数据库中。搜索邮箱时，请加英文引号("")。
+  id: ID
+  source: 来源
+  created_at: 创建时间
+  valid_until: 截止时间
+  operation:
+    text: 操作
+    delete: 删除
+    confirm_deletion: 确认删除？
+    invalidate: 释放
+    confirm_invalidation: 确认释放？
