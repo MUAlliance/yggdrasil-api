@@ -21,8 +21,14 @@ class UnionProfileController extends Controller {
             $promisesDup[] = $client->requestAsync('GET', option('union_api_root').'/profile/unmapped/byname/'.urlencode($profile->name));
             $promisesSelf[] = $client->requestAsync('GET', option('union_api_root').'/profile/detail/'.$profile->uuid);
         }
-        $responsesDup = Promise\unwrap($promisesDup);
-        $responsesSelf = Promise\unwrap($promisesSelf);
+        if (class_exists('Promise::Utils')){
+            $responsesDup = Promise\Utils::unwrap($promisesDup);
+            $responsesSelf = Promise\Utils::unwrap($promisesSelf);
+        } else {
+            /* Deprecated and removed in latest Guzzle Promise */
+            $responsesDup = Promise\unwrap($promisesDup);
+            $responsesSelf = Promise\unwrap($promisesSelf);
+        }
         $profiles = [];
         foreach ($responsesDup as $key => $response) {
             $profiles[] = ['dup_name' => json_decode($response->getBody(), true)];

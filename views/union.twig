@@ -134,8 +134,8 @@
         </div>
     </div>
   </div>
-<script src="https://gcore.jsdelivr.net/npm/marked@4.1.1/marked.min.js"></script>
-<script src="https://gcore.jsdelivr.net/npm/dompurify@2.4.0/dist/purify.min.js"></script>
+<script src="https://unpkg.com/marked@4.1.1/marked.min.js"></script>
+<script src="https://unpkg.com/dompurify@2.4.0/dist/purify.min.js"></script>
 <script>
 function fetchToken(uuid) {
   blessing.fetch.post("/union/bind", { 'uuid' : uuid }).then((response) => {
