@@ -6,6 +6,7 @@ use Yggdrasil\Exceptions\ForbiddenOperationException;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Cache;
 use Vectorface\Whip\Whip;
+use Log;
 
 class UnionHostVerify {
     
@@ -51,20 +52,22 @@ class UnionHostVerify {
         $timestamp = $request->header('X-Message-Timestamp');
         $nonce = $request->header('X-Message-Nonce');
         $body = $request->getContent();
-        $uri = $request->getRequestUri();
 
         // Prevent replay attack
         if (Cache::has('union_host_signature_'.$nonce)) {
+            Log::channel('ygg')->info("Union host verification failure: Invalid nonce.");
             throw new ForbiddenOperationException("Union host verification failure.");
         }
         if ($timestamp < time() - 10 || $timestamp > time() + 30) {
+            Log::channel('ygg')->info("Union host verification failure: Invalid timestamp.");
             throw new ForbiddenOperationException("Union host verification failure.");
         }
 
         // Verify signature
         $public_key = Http::get(option('union_api_root'))->json('union_host_signature_public_key');
 
-        if (openssl_verify($uri.$body.$timestamp.$nonce, base64_decode($signature), $public_key, OPENSSL_ALGO_SHA256) != 1) {
+        if (openssl_verify($body.$timestamp.$nonce, base64_decode($signature), $public_key, OPENSSL_ALGO_SHA256) != 1) {
+            Log::channel('ygg')->info("Union host verification failure: Invalid signature.");
             throw new ForbiddenOperationException("Union host verification failure.");
         }
 

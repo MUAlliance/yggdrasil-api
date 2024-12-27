@@ -20,7 +20,7 @@
         <div class="card-body">
           <p id="union-uptodate">{{ trans('Yggdrasil::config.union.data.uptodate') }}</p>
           <p id="union-outdated" hidden>{{ trans('Yggdrasil::config.union.data.outdated') }}</p>
-          <button id="union-update-list" class="btn btn-default" onClick="triggerUpdate()" value="">{{ trans('Yggdrasil::config.union.data.trigger_update') }}</button>
+          <button id="union-update-list" class="btn btn-default" onClick="triggerUpdateServerList()" value="">{{ trans('Yggdrasil::config.union.data.trigger_update') }}</button>
           <button id="union-update-key" class="btn btn-default" onClick="triggerUpdateKey()" value="">{{ trans('Yggdrasil::config.union.data.trigger_update_key') }}</button>
           <button id="union-sync" class="btn btn-default" onClick="triggerSync()" value="">{{ trans('Yggdrasil::config.union.data.trigger_sync') }}</button>
         </div>
@@ -66,7 +66,7 @@
       <script src="https://unpkg.com/marked@4.1.1/marked.min.js"></script>
       <script src="https://unpkg.com/dompurify@2.4.0/dist/purify.min.js"></script>
       <script>
-        function triggerUpdate() {
+        function triggerUpdateServerList() {
             blessing.fetch.post("/admin/union/member/updatelist").then((response) => {
               location.reload();
             });
