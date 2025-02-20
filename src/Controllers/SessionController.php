@@ -22,6 +22,8 @@ class SessionController extends Controller
   
     public function joinServer(Request $request, Filter $filter)
     {
+        @ ini_set('memory_limit', '32M');
+      
         $accessToken = $request->input('accessToken');
         $selectedProfile = $request->input('selectedProfile');
         $serverId = $request->input('serverId');
@@ -125,6 +127,8 @@ class SessionController extends Controller
 
     public function hasJoinedServer(Request $request)
     {
+        @ ini_set('memory_limit', '32M');
+      
         $name = $request->input('username');
         $serverId = $request->input('serverId');
         $ip = $request->input('ip');
