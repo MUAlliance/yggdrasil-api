@@ -12,7 +12,7 @@ class UnionBlacklistController extends Controller
     public function viewBlacklist(Request $request)
     {
         $response = Http::withHeaders(['X-Union-Member-Key' => option('union_member_key')])->get(option('union_api_root').'/blacklist/query', $request->input());
-      	return response($response->body(), $response->status())->withHeaders($response->headers());
+      	return response($response->body(), $response->status())->header('Content-Type', $response->headers()['Content-Type'] ?? 'application/json');
     }
   
     public function create(Request $request)
@@ -21,19 +21,19 @@ class UnionBlacklistController extends Controller
         if ($response->ok()) {
         	return back();
         }
-      	return response($response->body(), $response->status())->withHeaders($response->headers());
+      	return response($response->body(), $response->status())->header('Content-Type', $response->headers()['Content-Type'] ?? 'application/json');
     }
   
   	public function invalidate($id)
     {
       	$response = Http::withHeaders(['X-Union-Member-Key' => option('union_member_key')])->put(option('union_api_root').'/blacklist/invalidate/'.$id);
-      	return response($response->body(), $response->status())->withHeaders($response->headers());
+      	return response($response->body(), $response->status())->header('Content-Type', $response->headers()['Content-Type'] ?? 'application/json');
     }
   
     public function delete($id)
     {
       	$response = Http::withHeaders(['X-Union-Member-Key' => option('union_member_key')])->delete(option('union_api_root').'/blacklist/restful/'.$id);
-      	return response($response->body(), $response->status())->withHeaders($response->headers());
+      	return response($response->body(), $response->status())->header('Content-Type', $response->headers()['Content-Type'] ?? 'application/json');
     }
   
   	/**
