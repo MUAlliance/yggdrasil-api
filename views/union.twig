@@ -170,7 +170,7 @@ function fetchDescription(api) {
     let e = document.getElementById("desc");
     fetch(request, conf).then(function(response) {
       	response.json().then(function(data) {
-		    e.innerHTML = DOMPurify.sanitize(marked.parse(data.meta.description));
+		    e.innerHTML = DOMPurify.sanitize(marked.parse(blessing.locale === 'en' ? data.meta.description_en : data.meta.description));
       	});
 	});
 }

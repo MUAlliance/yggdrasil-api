@@ -1,0 +1,57 @@
+title: Union
+
+profile:
+  title: Player Binding and Collision Check
+  label: Users from other Union user centers may have players with the same name. On such occasion a mapped player name will be used to join servers prevent collision. You can either change your player name, or bind players if you also own the account with the same player name in other user centers. The player that is binded to are called the main player. Use other player account that binded to the main player will use the main player's name and UUID and it's own skin and cape. The main player can't bind to other players. Binding doesn't have restriction of player names. Binding UUID means syncing UUID to all Union user centers. If you use Minecraft 1.19+ and encounter error of invalid signature, you may need to bind UUID. For versions older than 1.19, binding is not a must. For Minecraft servers not using Union authentication, changing UUID will invalidate the player's data associated with the UUID. Binding is not revertable!
+  mapped_name: Mapped player name
+  other_info: Other info
+  yourself: Current player name
+  bind_master: Main player name binded to
+  dup:
+    name: Players with the same name
+  uuid:
+    mapped: Mapped UUID
+    unmapped: Original UUID
+    using: Using
+    
+exceptions:
+  profile_update_failed: Users from other Union user centers may have players with the same name. 
+
+bind:
+  label: Get Token for the main player; Enter Token to bind this player to another main player. Token is valid in 2 minutes.
+  button:
+    token: Get Token
+    bindto: Bind
+    unbind: Unbind
+    remapuuid: Bind all players to this UUID
+  unbind:
+    confirm: Confirm Unbind?
+  remapuuid:
+    confirm: Binded UUID will sync to all user centers. For Minecraft servers not using Union authentication, changing UUID will invalidate the player's data associated with the UUID. The UUID in the form is remapped and may be different from the user center's UUID.
+
+
+backend:
+  security:
+    level: User Center Security
+    label: Security Level
+    desc_sl3: Joined Union Blacklist & Trusted
+    desc_sl1: Joined Union Blacklist
+    desc_sl0: Didn't Join Union Blacklist
+
+blacklist:
+  title: Union Blacklist
+  add: Add
+  email: E-Mail address
+  reason: Reason
+  submit: Sumbit
+  search: Search
+  id: ID
+  source: Source
+  created_at: Created at
+  valid_until: Valid until
+  operation:
+    text: Operation
+    delete: Delete
+    confirm_deletion: Confirm deletion?
+    invalidate: Unban
+    confirm_invalidation: Confirm Unban?

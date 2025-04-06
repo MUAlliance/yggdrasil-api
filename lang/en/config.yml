@@ -1,7 +1,7 @@
 title: Yggdrasil API Configuration
 
 url:
-  label: 'Yggdrasil API URL:'
+  label: 'Yggdrasil API URL: '
   notice: Please make sure the URL above is accessible before configuring authlib-injector.
 
 common:
@@ -49,3 +49,12 @@ keypair:
 rsa:
   invalid: Invalid RSA private key. Please re-configure it.
   length: The length of RSA private key must be greater than 4096. Please re-configure it.
+  
+union:
+  title: Union Configuration
+  backend:
+    title: User Center List
+    code: User Center Code
+    name: User Center Name
+    bs_root: User Center URL
+
