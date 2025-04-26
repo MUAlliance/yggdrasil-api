@@ -72,6 +72,7 @@ union:
     trigger_update: 更新服务器列表
     trigger_update_key: 更新密钥对
     trigger_sync: 同步角色数据
+    trigger_diagnose: 自助诊断
   backend:
     title: 皮肤站列表
     code: 皮肤站缩写

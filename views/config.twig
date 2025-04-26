@@ -23,6 +23,7 @@
           <button id="union-update-list" class="btn btn-default" onClick="triggerUpdateServerList()" value="">{{ trans('Yggdrasil::config.union.data.trigger_update') }}</button>
           <button id="union-update-key" class="btn btn-default" onClick="triggerUpdateKey()" value="">{{ trans('Yggdrasil::config.union.data.trigger_update_key') }}</button>
           <button id="union-sync" class="btn btn-default" onClick="triggerSync()" value="">{{ trans('Yggdrasil::config.union.data.trigger_sync') }}</button>
+          <button id="union-diagnose" class="btn btn-default position-relative" onClick="resetDiagnose()" data-toggle="modal" data-target="#diagnoseModal">{{ trans('Yggdrasil::config.union.data.trigger_diagnose') }}</button>
         </div>
       </div>
       <div class="card card-primary">
@@ -63,6 +64,30 @@
         {{ include('Yggdrasil::servers.twig') }}
         </div>
       </div>
+      <div class="modal fade" id="diagnoseModal" tabindex="-1" role="dialog" aria-labelledby="diagnoseModal" aria-hidden="true">
+        <div class="modal-dialog modal-xl" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="diagnoseModal">{{ trans('Yggdrasil::config.union.data.trigger_diagnose') }}</h5>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <div class="modal-body">
+              <div class="text-center">
+                <button id="diagnose-start" class="btn btn-primary mt-4 mb-5" onClick="triggerDiagnose()" value=""><i class="fas fa-stethoscope"></i> 开始诊断</button>
+                <div id="diagnose-loading" class="mt-4 mb-5" style="display: none">
+                  <div class="spinner-grow text-primary" role="status">
+                  </div>
+                  <span class="ml-2">正在进行诊断...</span>
+                </div>
+              </div>
+              <div id="diagnose-result" class="ml-3 mr-3 mb-3 mt-2" style="display: none">
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
       <script src="https://unpkg.com/marked@4.1.1/marked.min.js"></script>
       <script src="https://unpkg.com/dompurify@2.4.0/dist/purify.min.js"></script>
       <script>
@@ -80,6 +105,61 @@
             blessing.fetch.post("/admin/union/member/sync").then((response) => {
               location.reload();
             });
+        }
+        function textareaEscape(input) {
+            const textarea = document.createElement("textarea");
+            textarea.textContent = input;
+            return textarea.innerHTML;
+        }
+        function triggerDiagnose() {
+            document.getElementById('diagnose-start').style.display = 'none';
+            document.getElementById('diagnose-loading').style.display = 'flex';
+            document.getElementById('diagnose-loading').style.justifyContent = 'center';
+            document.getElementById('diagnose-loading').style.alignItems = 'center';
+            blessing.fetch.post("/admin/union/member/diagnose").then((response) => {
+              document.getElementById('diagnose-start').style.display = 'none';
+              document.getElementById('diagnose-loading').style.display = 'none';
+              document.getElementById('diagnose-result').style.display = 'block';
+              console.log(response);
+              let table = '<table class="table table-hover table-bordered"><tbody>';
+              table += `<tr><th class="text-center align-middle" scope="row" width="20%">皮肤站<i class="fas fa-long-arrow-alt-right"></i>Union</th><td>${response.status === 'ok' ? '<span class="badge bg-success">成功</span>' : '<span class="badge bg-danger">失败</span>'}</td></tr>`;
+              if (response.status === 'ok') {
+                table += `<tr><th class="text-center align-middle" scope="row">Union<i class="fas fa-long-arrow-alt-right"></i>皮肤站</th><td>${response.data.healthy ? '<span class="badge bg-success">成功</span>' : '<span class="badge bg-danger">失败</span>'}</td></tr>`;
+                if (response.data.healthy) {
+                  table += `<tr><th class="text-center align-middle" scope="row">单程时延</th><td>${(response.data.delay * 1000).toFixed(2)} 毫秒</td></tr>`;
+                }
+                if (response.data.timestamp) {
+                  table += `<tr><th class="text-center align-middle" scope="row">Union 时间戳</th><td>${textareaEscape(response.data.timestamp)}</td></tr>`;
+                }
+                if (response.data.tls_handshake) {
+                  table += `<tr><th class="text-center align-middle" scope="row">TLS 握手</th><td><textarea class="form-control" rows="8" readonly="">${textareaEscape(response.data.tls_handshake)}</textarea></td></tr>`;
+                }
+              }
+              if (response.data.exception) {
+                table += `<tr><th class="text-center align-middle" scope="row">错误信息</th><td><textarea class="form-control" rows="8" readonly="">${textareaEscape(response.data.exception)}</textarea></td></tr>`;
+              }
+              if (response.data.status_code) {
+                table += `<tr><th class="text-center align-middle" scope="row">状态码</th><td>${textareaEscape(response.data.status_code)}</td></tr>`;
+              }
+              if (response.data.headers) {
+                table += `<tr><th class="text-center align-middle" scope="row">响应头</th><td><textarea class="form-control" rows="8" readonly="">${textareaEscape(JSON.stringify(response.data.headers, null, 2))}</textarea></td></tr>`
+              }
+              if (response.data.body) {
+                table += `<tr><th class="text-center align-middle" scope="row">响应体</th><td><textarea class="form-control" rows="8" readonly="">${textareaEscape(response.data.body)}</textarea></td></tr>`
+              }
+              table += '</tbody></table>';
+              const blob = new Blob([table], {
+                type: "application/html",
+              });
+              const blobURL = window.URL.createObjectURL(blob);
+              const exportBtn = `<a class="btn btn-primary btn-sm mb-3" href="${blobURL}" target="_blank" download="诊断报告-${Math.round(new Date().getTime() / 1000)}.html"><i class="fas fa-file-export"></i> 导出诊断报告</a>`;
+              document.getElementById('diagnose-result').innerHTML = exportBtn + table;
+            });
+        }
+        function resetDiagnose() {
+            document.getElementById('diagnose-start').style.display = 'inline-block';
+            document.getElementById('diagnose-loading').style.display = 'none';
+            document.getElementById('diagnose-result').style.display = 'none';
         }
         function fetchAdminNotice(api) {
             let conf = { method: 'GET',

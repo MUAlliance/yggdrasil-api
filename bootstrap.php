@@ -156,6 +156,7 @@ return function (Filter $filter, Dispatcher $events) {
                 Route::post('updateplugin', 'UpdateController@update');
               
               	Route::get('queryemail','UnionBlacklistController@queryEmail');
+                Route::post('diagnose', 'UnionController@diagnose');
             });
 
         Route::namespace('Yggdrasil\Controllers')
@@ -190,6 +191,7 @@ return function (Filter $filter, Dispatcher $events) {
                 Route::post('member/updatelist', 'UnionController@updateList');
                 Route::post('member/updateprivatekey', 'UnionController@updatePrivateKey');
                 Route::post('member/sync', 'UnionController@triggerSync');
+                Route::post('member/diagnose', 'UnionController@triggerDiagnose');
               
                 Route::view('view/blacklist', 'Yggdrasil::blacklist');
                 Route::get('view/blacklist/list', 'UnionBlacklistController@viewBlacklist');

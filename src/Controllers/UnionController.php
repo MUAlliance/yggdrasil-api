@@ -95,4 +95,20 @@ class UnionController extends Controller {
         return;
     }
 
+    public function diagnose(Request $request) {
+        return [ 'nonce' => $request->input('nonce'), 'timestamp' => microtime(true) ];
+    }
+
+    public function triggerDiagnose() {
+        try {
+            $response = Http::timeout(10.0)->withHeaders([ 'X-Union-Member-Key' => option('union_member_key')])->post(option('union_api_root').'/diagnose');
+            if ($response->ok()) {
+                return [ 'status' => 'ok', 'data' => $response->json() ];
+            }
+            return [ 'status' => 'error', 'data' => [ 'status_code' => $response->status(), 'headers' => $response->headers(), 'body' => $response->body() ] ];
+        } catch (\Exception $e) {
+            return [ 'status' => 'error', 'data' => [ 'exception' => $e->getMessage() ] ];
+        }
+    }
+
 }
